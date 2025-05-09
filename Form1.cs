@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Media;
 using System.Windows.Forms;
@@ -15,8 +16,11 @@ namespace Soundbox
         public Form1()
         {
             InitializeComponent();
+            reloadS();
+        }
 
-
+        public void reloadS()
+        {
             sounds = Directory.GetFiles(Path.Combine(path, "Sounds"), "*.wav");
 
             if (sounds.Length == 0)
@@ -33,6 +37,7 @@ namespace Soundbox
                 if (i < sounds.Length)
                 {
                     string fileName = Path.GetFileNameWithoutExtension(sounds[i]);
+                    buttons[i].Enabled = true;
                     buttons[i].Text = fileName;
                 }
                 else
@@ -42,7 +47,6 @@ namespace Soundbox
                 }
             }
         }
-
         private void playSound(string path)
         {
             try
@@ -111,6 +115,53 @@ namespace Soundbox
         private void buttonS_Click(object sender, EventArgs e)
         {
             stopAllSounds();
+        }
+
+        private void buttonrRe_Click(object sender, EventArgs e)
+        {
+            reloadS();
+        }
+
+        private void buttonUp_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Title = "Select WAV files",
+                Filter = "WAV Files (*.wav)|*.wav",
+                Multiselect = true
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string[] selectedFiles = openFileDialog.FileNames;
+
+                Console.WriteLine("Selected WAV files:");
+                foreach (string filePath in selectedFiles)
+                {
+                    File.Copy(filePath, Path.Combine(path, "Sounds", Path.GetFileName(filePath)), overwrite: true);
+                }
+            }
+            reloadS();
+        }
+
+        private void buttonOp_Click(object sender, EventArgs e)
+        {
+            string folderPath = Path.Combine(path, "Sounds");
+
+            if (!Directory.Exists(folderPath))
+            {
+                MessageBox.Show("The Sounds has been deleted.");
+                return;
+            }
+
+            try
+            {
+                Process.Start("explorer.exe", folderPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening folder: {ex.Message}");
+            }
         }
     }
 }
