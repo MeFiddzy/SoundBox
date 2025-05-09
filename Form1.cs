@@ -15,8 +15,11 @@ namespace Soundbox
         public Form1()
         {
             InitializeComponent();
+            reloadS();
+        }
 
-
+        public void reloadS()
+        {
             sounds = Directory.GetFiles(Path.Combine(path, "Sounds"), "*.wav");
 
             if (sounds.Length == 0)
@@ -42,7 +45,6 @@ namespace Soundbox
                 }
             }
         }
-
         private void playSound(string path)
         {
             try
@@ -111,6 +113,11 @@ namespace Soundbox
         private void buttonS_Click(object sender, EventArgs e)
         {
             stopAllSounds();
+        }
+
+        private void buttonrRe_Click(object sender, EventArgs e)
+        {
+            reloadS();
         }
     }
 }

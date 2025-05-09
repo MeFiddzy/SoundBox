@@ -45,6 +45,7 @@
             b14 = new Button();
             b13 = new Button();
             buttonS = new Button();
+            buttonrRe = new Button();
             SuspendLayout();
             // 
             // b1
@@ -234,11 +235,23 @@
             buttonS.UseVisualStyleBackColor = true;
             buttonS.Click += buttonS_Click;
             // 
+            // buttonrRe
+            // 
+            buttonrRe.Font = new Font("Segoe UI", 20F);
+            buttonrRe.Location = new Point(453, 481);
+            buttonrRe.Name = "buttonrRe";
+            buttonrRe.Size = new Size(217, 92);
+            buttonrRe.TabIndex = 17;
+            buttonrRe.Text = "Reload Soundboard";
+            buttonrRe.UseVisualStyleBackColor = true;
+            buttonrRe.Click += buttonrRe_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1026, 618);
+            Controls.Add(buttonrRe);
             Controls.Add(buttonS);
             Controls.Add(b16);
             Controls.Add(b15);
@@ -280,5 +293,6 @@
         private Button b14;
         private Button b13;
         private Button buttonS;
+        private Button buttonrRe;
     }
 }
