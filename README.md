@@ -7,3 +7,7 @@ To upload the sounds manualy they should be in the .wav format and be put in the
 ## With the UI
 Click the Upload files button.
 ### [mp4 to wav convertor](https://cloudconvert.com/)
+# Why is this better than any other soundboard?
+- I have no idea
+- it is made my me? (so narcacistic)
+- idk
