@@ -46,6 +46,8 @@
             b13 = new Button();
             buttonS = new Button();
             buttonrRe = new Button();
+            buttonUp = new Button();
+            buttonOp = new Button();
             SuspendLayout();
             // 
             // b1
@@ -227,7 +229,7 @@
             // buttonS
             // 
             buttonS.Font = new Font("Segoe UI", 20F);
-            buttonS.Location = new Point(695, 481);
+            buttonS.Location = new Point(767, 486);
             buttonS.Name = "buttonS";
             buttonS.Size = new Size(217, 92);
             buttonS.TabIndex = 16;
@@ -238,7 +240,7 @@
             // buttonrRe
             // 
             buttonrRe.Font = new Font("Segoe UI", 20F);
-            buttonrRe.Location = new Point(453, 481);
+            buttonrRe.Location = new Point(525, 486);
             buttonrRe.Name = "buttonrRe";
             buttonrRe.Size = new Size(217, 92);
             buttonrRe.TabIndex = 17;
@@ -246,11 +248,35 @@
             buttonrRe.UseVisualStyleBackColor = true;
             buttonrRe.Click += buttonrRe_Click;
             // 
+            // buttonUp
+            // 
+            buttonUp.Font = new Font("Segoe UI", 20F);
+            buttonUp.Location = new Point(278, 486);
+            buttonUp.Name = "buttonUp";
+            buttonUp.Size = new Size(217, 92);
+            buttonUp.TabIndex = 18;
+            buttonUp.Text = "Upload files";
+            buttonUp.UseVisualStyleBackColor = true;
+            buttonUp.Click += buttonUp_Click;
+            // 
+            // buttonOp
+            // 
+            buttonOp.Font = new Font("Segoe UI", 20F);
+            buttonOp.Location = new Point(54, 486);
+            buttonOp.Name = "buttonOp";
+            buttonOp.Size = new Size(217, 92);
+            buttonOp.TabIndex = 19;
+            buttonOp.Text = "Open sound folder";
+            buttonOp.UseVisualStyleBackColor = true;
+            buttonOp.Click += buttonOp_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1026, 618);
+            Controls.Add(buttonOp);
+            Controls.Add(buttonUp);
             Controls.Add(buttonrRe);
             Controls.Add(buttonS);
             Controls.Add(b16);
@@ -294,5 +320,7 @@
         private Button b13;
         private Button buttonS;
         private Button buttonrRe;
+        private Button buttonUp;
+        private Button buttonOp;
     }
 }
