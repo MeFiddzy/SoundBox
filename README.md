@@ -2,7 +2,7 @@
 
 # Uploading the sounds
 ## Manual
-To upload the sounds manualy they should be in the .wav format and be put in the Sounds directory, i haven't made a way to upload them in app.
+To upload the sounds manualy they should be in the .wav format and be put in the Sounds directory.
 ## With the UI
 Click the Upload files button.
 # Ordering the sounds
