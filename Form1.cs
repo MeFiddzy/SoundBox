@@ -1,3 +1,4 @@
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,9 +11,11 @@ namespace Soundbox
 {
     public partial class Form1 : Form
     {
+        private float fadeOutConst = 0.5f;
+        private const int steps = 30;
         private string[] sounds;
         private string path = AppContext.BaseDirectory;
-        private List<SoundPlayer> activePlayers = new List<SoundPlayer>();
+        private List<WaveOut> activePlayers = new List<WaveOut>();
 
         public Form1()
         {
@@ -21,7 +24,7 @@ namespace Soundbox
 
             if (sounds.Length == 0)
             {
-                MessageBox.Show("Warning: There are no .wav files in the Sounds folder.", "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Warning: There are no .mp3 files in the Sounds folder.", "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -29,7 +32,7 @@ namespace Soundbox
         {
             try
             {
-                sounds = Directory.GetFiles(Path.Combine(path, "Sounds"), "*.wav");
+                sounds = Directory.GetFiles(Path.Combine(path, "Sounds"), "*.mp3");
             }
             catch
             {
@@ -44,8 +47,8 @@ namespace Soundbox
             }
             else
             {
-                
-                buttonUp.Enabled= true;
+
+                buttonUp.Enabled = true;
             }
 
             Button[] buttons = { b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15, b16, b17, b18, b19, b20 };
@@ -70,9 +73,12 @@ namespace Soundbox
         {
             try
             {
-                SoundPlayer player = new SoundPlayer(path);
-                player.Play();
-                activePlayers.Add(player);
+                WaveOut wave = new WaveOut();
+                wave.Init(new Mp3FileReader(path));
+                wave.Volume = 1.0f;
+                wave.Play();
+                activePlayers.Add(wave);
+
             }
             catch (Exception ex)
             {
@@ -80,13 +86,37 @@ namespace Soundbox
             }
         }
 
-        private void stopAllSounds()
+        private float max(float a, float b)
         {
-            foreach (SoundPlayer player in activePlayers)
+            if (a > b)
+                return a;
+            else
+                return b;
+        }
+
+        private async void fade(WaveOut player, float secs)
+        {
+            int interval = (int)((secs * 1000) / steps);
+            for (int i = 0; i < steps; i++)
+            {
+                player.Volume = max(0.0f, 1.0f - (float)(i) / steps);
+                await Task.Delay(interval);
+            }
+            player.Stop();
+            player.Dispose();
+        }
+
+        private void stopAllSounds(float secsOfFade = 0.0f)
+        {
+            foreach (WaveOut player in activePlayers)
             {
                 try
                 {
-                    player.Stop();
+                    if (secsOfFade == 0.0f)
+                        player.Stop();
+                    else
+                        fade(player, secsOfFade);
+
                 }
                 catch (Exception ex)
                 {
@@ -111,7 +141,7 @@ namespace Soundbox
             }
 
             MessageBox.Show("Warning: No sound file found.", "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        }     
+        }
 
         private void buttonS_Click(object sender, EventArgs e)
         {
@@ -127,16 +157,14 @@ namespace Soundbox
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Title = "Select WAV files",
-                Filter = "WAV Files (*.wav)|*.wav",
+                Title = "Select MP3 files",
+                Filter = "MP3 Files (*.mp3)|*.mp3",
                 Multiselect = true
             };
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string[] selectedFiles = openFileDialog.FileNames;
-
-                Console.WriteLine("Selected WAV files:");
                 foreach (string filePath in selectedFiles)
                 {
                     File.Copy(filePath, Path.Combine(path, "Sounds", Path.GetFileName(filePath)), overwrite: true);
@@ -187,5 +215,20 @@ namespace Soundbox
         private void b18_Click(object sender, EventArgs e) => playButtonSound(b18);
         private void b19_Click(object sender, EventArgs e) => playButtonSound(b19);
         private void b20_Click(object sender, EventArgs e) => playButtonSound(b20);
+
+        private void buttonFade_Click(object sender, EventArgs e)
+        {
+
+            stopAllSounds(fadeOutConst);
+        }        
+
+        private void textBoxFadeOut_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                fadeOutConst = (float)(Int32.Parse(textBoxFadeOut.Text));
+            }
+            catch { }
+        }
     }
 }

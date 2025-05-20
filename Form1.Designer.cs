@@ -54,6 +54,8 @@
             b17 = new Button();
             labelS = new Label();
             labelSet = new Label();
+            buttonFade = new Button();
+            textBoxFadeOut = new TextBox();
             SuspendLayout();
             // 
             // b1
@@ -364,11 +366,35 @@
             labelSet.TabIndex = 25;
             labelSet.Text = "Settings:";
             // 
+            // buttonFade
+            // 
+            buttonFade.Font = new Font("Segoe UI", 20F);
+            buttonFade.Location = new Point(413, 1146);
+            buttonFade.Margin = new Padding(4, 5, 4, 5);
+            buttonFade.Name = "buttonFade";
+            buttonFade.Size = new Size(310, 120);
+            buttonFade.TabIndex = 26;
+            buttonFade.Text = "Fade out all Sounds";
+            buttonFade.UseVisualStyleBackColor = true;
+            buttonFade.Click += buttonFade_Click;
+            // 
+            // textBoxFadeOut
+            // 
+            textBoxFadeOut.Font = new Font("Segoe UI", 20F);
+            textBoxFadeOut.Location = new Point(759, 1179);
+            textBoxFadeOut.Name = "textBoxFadeOut";
+            textBoxFadeOut.Size = new Size(310, 61);
+            textBoxFadeOut.TabIndex = 27;
+            textBoxFadeOut.Text = "0.5";
+            textBoxFadeOut.TextChanged += textBoxFadeOut_TextChanged;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1466, 1150);
+            ClientSize = new Size(1466, 1277);
+            Controls.Add(textBoxFadeOut);
+            Controls.Add(buttonFade);
             Controls.Add(labelSet);
             Controls.Add(labelS);
             Controls.Add(b20);
@@ -430,5 +456,7 @@
         private Button b17;
         private Label labelS;
         private Label labelSet;
+        private Button buttonFade;
+        private TextBox textBoxFadeOut;
     }
 }
