@@ -1,35 +1,35 @@
 using NAudio.Wave;
 using System;
+using NAudio.CoreAudioApi;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Media;
 using System.Reflection;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace Soundbox
 {
-    public partial class Form1 : Form
+    public partial class Soundbox : Form
     {
         private float fadeOutConst = 0.5f;
-        private const int steps = 30;
+        private const int steps = 40;
         private string[] sounds;
+        private Mp3FileReader[] readers;
         private string path = AppContext.BaseDirectory;
         private List<WaveOut> activePlayers = new List<WaveOut>();
+        private SoundFile[] so;
 
-        public Form1()
+        public Soundbox()
         {
             InitializeComponent();
             reloadS();
-
-            if (sounds.Length == 0)
-            {
-                MessageBox.Show("Warning: There are no .mp3 files in the Sounds folder.", "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
+        }       
 
         public void reloadS()
         {
+            stopAllSounds();
             try
             {
                 sounds = Directory.GetFiles(Path.Combine(path, "Sounds"), "*.mp3");
@@ -37,7 +37,6 @@ namespace Soundbox
             catch
             {
                 MessageBox.Show("Error: The Sounds folder has been deleted!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Close();
                 return;
             }
 
@@ -53,14 +52,24 @@ namespace Soundbox
 
             Button[] buttons = { b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15, b16, b17, b18, b19, b20 };
 
+            readers = new Mp3FileReader[sounds.Length];
+            so = new SoundFile[sounds.Length];
+
             for (int i = 0; i < buttons.Length; i++)
             {
                 if (i < sounds.Length)
                 {
-                    string fileName = Path.GetFileNameWithoutExtension(sounds[i]);
-                    fileName = fileName.IndexOf('`') != -1 ? fileName.Substring(fileName.IndexOf('`') + 1) : fileName;
+                    try
+                    {
+                        readers[i] = new Mp3FileReader(sounds[i]);
+                    }
+                    catch {
+                        MessageBox.Show("Error: mp3 file is corupted!.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    string fileName = Path.GetFileNameWithoutExtension(sounds[i]);                    
                     buttons[i].Enabled = true;
                     buttons[i].Text = fileName;
+                    so[i] = new SoundFile(Path.Combine(path, "Sounds", sounds[i]), fileName);
                 }
                 else
                 {
@@ -71,20 +80,52 @@ namespace Soundbox
         }
         private void playSound(string path)
         {
+            int index = 0;
+            for (int i = 0; i < sounds.Length; i++)
+            {
+                if (path == sounds[i])
+                    index = i;
+            }
             try
             {
                 WaveOut wave = new WaveOut();
-                wave.Init(new Mp3FileReader(path));
+                try
+                {
+                    wave.Init(readers[index]);
+                }
+                catch
+                {
+                    MessageBox.Show("Error: mp3 file is corupted!.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 wave.Volume = 1.0f;
+
+                wave.PlaybackStopped += (sender, e) =>
+                {
+                    var player = sender as WaveOut;
+                    if (player != null)
+                    {                        
+                        if (activePlayers.Contains(player))
+                            activePlayers.Remove(player);
+                        player.Dispose();
+                    }
+                };
+
                 wave.Play();
                 activePlayers.Add(wave);
-
+                try
+                {
+                    readers[index] = new Mp3FileReader(sounds[index]);
+                }
+                catch {
+                    MessageBox.Show("Error: mp3 file is corupted!.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            catch (Exception ex)
+            catch
             {
                 MessageBox.Show("Warning: Tried playing an unexisting sound.", "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+
 
         private float max(float a, float b)
         {
@@ -97,6 +138,13 @@ namespace Soundbox
         private async void fade(WaveOut player, float secs)
         {
             int interval = (int)((secs * 1000) / steps);
+            if (interval < 0)
+            {
+                player.Stop();
+                player.Dispose();
+                MessageBox.Show("Error: The fade time has been set to a negative number or the interval variable got bigger than 2,147,483,647.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             for (int i = 0; i < steps; i++)
             {
                 player.Volume = max(0.0f, 1.0f - (float)(i) / steps);
@@ -180,7 +228,6 @@ namespace Soundbox
             if (!Directory.Exists(folderPath))
             {
                 MessageBox.Show("Error: The Sounds has been deleted.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Close();
                 return;
             }
 
@@ -191,7 +238,6 @@ namespace Soundbox
             catch (Exception ex)
             {
                 MessageBox.Show("Error: The Sounds has been deleted.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Close();
                 return;
             }
         }
@@ -220,15 +266,25 @@ namespace Soundbox
         {
 
             stopAllSounds(fadeOutConst);
-        }        
+        }
 
         private void textBoxFadeOut_TextChanged(object sender, EventArgs e)
         {
             try
             {
+                if (textBoxFadeOut.Text == "cacatoare")
+                {
+                    MessageBox.Show("This is NOT an easter egg!", "I'm lying", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
                 fadeOutConst = (float)(Int32.Parse(textBoxFadeOut.Text));
             }
             catch { }
+        }
+
+        private void buttonDelPan_Click(object sender, EventArgs e)
+        {            
+            DelScreen delScreen = new DelScreen(so);
+            delScreen.Show();
         }
     }
 }
